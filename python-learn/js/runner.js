@@ -30,7 +30,8 @@ const PyRunner = {
   waiting: null,   // { id, resolve, timer }
   queue: Promise.resolve(),
   readyPromise: null,
-  TIMEOUT: 10000,
+  TIMEOUT: 15000,
+  LOAD_TIMEOUT: 180000,
 
   start() {
     if (this.worker) return this.readyPromise;
@@ -55,6 +56,16 @@ const PyRunner = {
       this.setState("error");
       return;
     }
+    if (this.waiting && msg.id === this.waiting.id && msg.type === "status") {
+      this.waiting.onStatus && this.waiting.onStatus(msg.text);
+      return;
+    }
+    if (this.waiting && msg.id === this.waiting.id && msg.type === "started") {
+      // 套件下載完、真正開始執行，才開始計算逾時
+      clearTimeout(this.waiting.timer);
+      this.waiting.timer = setTimeout(this.waiting.onTimeout, this.TIMEOUT);
+      return;
+    }
     if (this.waiting && msg.id === this.waiting.id) {
       clearTimeout(this.waiting.timer);
       const w = this.waiting;
@@ -77,7 +88,7 @@ const PyRunner = {
   },
 
   // 把程式排進佇列，一次只跑一個；超過時間就整個重開 worker（處理無窮迴圈）
-  run(code, stdin = "", check = "") {
+  run(code, stdin = "", check = "", onStatus = null) {
     const job = this.queue.then(async () => {
       await this.start();
       if (this.state === "error") {
@@ -86,15 +97,18 @@ const PyRunner = {
       return new Promise((resolve) => {
         const id = ++this.seq;
         this.setState("running");
-        const timer = setTimeout(() => {
+        const onTimeout = (loading) => {
           this.waiting = null;
           this.restart();
           resolve({
             output: "", error_type: "Timeout",
-            error: `執行超過 ${this.TIMEOUT / 1000} 秒被強制停止。很可能是無窮迴圈：檢查 while 的條件最後會不會變成 False。`,
+            error: loading
+              ? "下載套件花了太久時間，請檢查網路連線後再試一次。"
+              : `執行超過 ${this.TIMEOUT / 1000} 秒被強制停止。很可能是無窮迴圈：檢查 while 的條件最後會不會變成 False。`,
           });
-        }, this.TIMEOUT);
-        this.waiting = { id, resolve, timer };
+        };
+        const timer = setTimeout(() => onTimeout(true), this.LOAD_TIMEOUT);
+        this.waiting = { id, resolve, timer, onStatus, onTimeout: () => onTimeout(false) };
         this.worker.postMessage({ id, type: "run", code, stdin, check });
       });
     });
@@ -127,11 +141,11 @@ function createCodeBlock(container, opts) {
   wrap.className = "code-block" + (ex ? " is-exercise" : "") + (opts.tall ? " tall" : "");
   wrap.innerHTML = `
     <div class="cb-toolbar">
-      <span class="cb-label">${ex ? "✏️ 你的答案" : opts.readOnly ? "範例" : "🐍 可以修改後執行"}</span>
+      <span class="cb-label">${ex ? "✏️ 你的答案" : opts.readOnly ? (opts.label || "📄 程式碼（在自己的電腦上執行）") : "🐍 可以修改後執行"}</span>
       <span class="cb-spacer"></span>
       ${ex && ex.hint ? `<button class="btn ghost small cb-hint">💡 提示</button>` : ""}
       ${ex && ex.solution ? `<button class="btn ghost small cb-sol">👀 看解答</button>` : ""}
-      ${opts.readOnly ? "" : `<button class="btn ghost small cb-reset" title="恢復原本的程式">↺ 重設</button>`}
+      ${opts.readOnly ? `<button class="btn ghost small cb-copy" title="複製程式碼">📋 複製</button>` : `<button class="btn ghost small cb-reset" title="恢復原本的程式">↺ 重設</button>`}
       ${opts.readOnly ? "" : `<button class="btn primary small cb-run" title="Ctrl + Enter">▶ ${ex ? "執行並檢查" : "執行"}</button>`}
     </div>
     <div class="cb-editor"></div>
@@ -201,7 +215,9 @@ function createCodeBlock(container, opts) {
     out.hidden = false;
     out.className = "cb-output";
     out.innerHTML = `<div class="muted">${PyRunner.state === "ready" ? "執行中…" : "⏳ 第一次執行要先下載 Python（約 5～15 秒），之後就很快了…"}</div>`;
-    const res = await PyRunner.run(cm.getValue(), stdinArea.value, ex ? ex.check : "");
+    const res = await PyRunner.run(cm.getValue(), stdinArea.value, ex ? ex.check : "", (text) => {
+      out.innerHTML = `<div class="muted">${escapeHtml(text)}</div>`;
+    });
     running = false;
     runBtn.textContent = ex ? "▶ 執行並檢查" : "▶ 執行";
     runBtn.classList.remove("danger");
@@ -210,7 +226,12 @@ function createCodeBlock(container, opts) {
 
   function showResult(res) {
     let html = "";
-    if (res.output) html += `<pre class="out-text">${escapeHtml(res.output)}</pre>`;
+    const chunks = res.chunks || (res.output ? [["text", res.output]] : []);
+    for (const [kind, data] of chunks) {
+      if (kind === "text") html += `<pre class="out-text">${escapeHtml(data)}</pre>`;
+      else if (kind === "img") html += `<img class="out-img" alt="程式畫出的圖表" src="data:image/png;base64,${data}">`;
+      else if (kind === "html") html += `<div class="out-html">${data}</div>`;
+    }
     if (res.error) {
       html += `<pre class="out-error">${escapeHtml(res.error.trimEnd())}</pre>`;
       const help = ERROR_HELP[res.error_type];
@@ -222,7 +243,7 @@ function createCodeBlock(container, opts) {
         if (errLine) cm.addLineClass(errLine, "background", "cm-error-line");
       }
     }
-    if (!res.output && !res.error) html += `<div class="muted">（程式執行完畢，沒有輸出任何內容）</div>`;
+    if (!chunks.length && !res.error) html += `<div class="muted">（程式執行完畢，沒有輸出任何內容）</div>`;
     if (ex && res.check) {
       if (res.check.ok) {
         html += `<div class="check ok">✅ 答對了！做得好。</div>`;
@@ -237,6 +258,12 @@ function createCodeBlock(container, opts) {
   }
 
   runBtn?.addEventListener("click", run);
+  wrap.querySelector(".cb-copy")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    try { await navigator.clipboard.writeText(cm.getValue()); btn.textContent = "✓ 已複製"; }
+    catch (_) { btn.textContent = "請手動選取"; }
+    setTimeout(() => (btn.textContent = "📋 複製"), 1500);
+  });
   wrap.querySelector(".cb-reset")?.addEventListener("click", () => {
     cm.setValue(opts.code.replace(/\n$/, ""));
     if (ex) Store.clearCode(ex.key);

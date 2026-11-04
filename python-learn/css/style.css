@@ -228,6 +228,13 @@ h1, h2, h3 { line-height: 1.3; }
 .cb-output { border-top: 1px solid var(--border); padding: 10px 14px; background: var(--surface); }
 .cb-output pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
 .out-text { color: var(--text); }
+.out-img { display: block; max-width: 100%; height: auto; margin: 8px 0; border-radius: 8px; background: #fff; border: 1px solid var(--border); }
+.out-html { overflow-x: auto; margin: 8px 0; }
+.out-html table { border-collapse: collapse; font-size: 13px; font-family: var(--mono); }
+.out-html th, .out-html td { border: 1px solid var(--border); padding: 4px 10px; text-align: right; white-space: nowrap; }
+.out-html thead th { background: var(--surface-2); }
+.out-html tbody th { background: var(--surface-2); text-align: left; }
+.out-html tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
 .out-error { color: var(--red); margin-top: 6px !important; }
 .err-help { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: var(--red-soft); font-size: 14px; line-height: 1.7; }
 .check { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 15px; }

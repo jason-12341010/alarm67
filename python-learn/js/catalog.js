@@ -40,7 +40,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s3", num: 3, part: "A", icon: "🟣", title: "物件導向", ready: false,
+    id: "s3", num: 3, part: "A", icon: "🟣", title: "物件導向", ready: true,
     desc: "class、繼承、多型、魔術方法、dataclass。",
     lessons: [
       "class 與物件", "__init__ 與 self", "繼承", "多型與鴨子型別", "封裝與 property",

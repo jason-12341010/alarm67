@@ -1,12 +1,35 @@
 // 在背景執行緒跑 Python，這樣無窮迴圈不會卡住整個網頁（主畫面可以直接把 worker 停掉）。
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
 
+// Pyodide 沒有內建、要從 PyPI 安裝的純 Python 套件：import 名稱 → 套件名稱
+const MICROPIP = { seaborn: "seaborn", openpyxl: "openpyxl" };
+const installed = new Set();
+const HEAVY = ["numpy", "pandas", "matplotlib", "sklearn", "scipy", "statsmodels", "pydantic", "sqlalchemy", "bs4", "lxml", "networkx", "sympy", "PIL", "cv2", "pytest", "seaborn", "openpyxl"];
+const loadedOnce = new Set();
+
 const ready = (async () => {
   const py = await loadPyodide();
   const harness = await (await fetch("harness.py")).text();
   py.runPython(harness);
   return py;
 })();
+
+function status(id, text) {
+  postMessage({ id, type: "status", text });
+}
+
+// 程式裡提到 data/ 資料夾裡有的檔案（例如 "titanic.csv"），就先放進虛擬檔案系統
+async function mountDataFiles(py, code) {
+  const names = new Set([...code.matchAll(/["']([\w.-]+\.(?:csv|json|txt))["']/g)].map((m) => m[1]));
+  for (const name of names) {
+    try {
+      if (py.FS.analyzePath(name).exists) continue;
+      const r = await fetch(`../data/${name}`);
+      if (!r.ok) continue;
+      py.FS.writeFile(name, new Uint8Array(await r.arrayBuffer()));
+    } catch (_) { /* 不是我們提供的資料檔，略過 */ }
+  }
+}
 
 self.onmessage = async (e) => {
   const { id, type, code, stdin, check } = e.data;
@@ -21,11 +44,29 @@ self.onmessage = async (e) => {
     postMessage({ id, type: "ready" });
     return;
   }
+  const all = code + "\n" + (check || "");
   try {
-    await py.loadPackagesFromImports(code + "\n" + (check || ""));
-  } catch (_) {
+    const wanted = py.pyodide_py.code.find_imports(all).toJs();
+    const missing = wanted.filter((m) => HEAVY.includes(m) && !loadedOnce.has(m));
+    missing.forEach((m) => loadedOnce.add(m));
+    if (missing.length) status(id, `📦 第一次使用，正在下載套件：${missing.join("、")}（可能要十幾秒）…`);
+    await py.loadPackagesFromImports(all);
+    const pip = wanted.filter((m) => MICROPIP[m] && !installed.has(m));
+    if (pip.length) {
+      status(id, `📦 正在從 PyPI 安裝：${pip.join("、")}…`);
+      await py.loadPackage("micropip");
+      const micropip = py.pyimport("micropip");
+      for (const m of pip) {
+        await micropip.install(MICROPIP[m]);
+        installed.add(m);
+      }
+    }
+    await mountDataFiles(py, all);
+  } catch (err) {
     /* 找不到的套件交給 Python 自己報 ModuleNotFoundError */
+    console.warn("套件載入失敗", err);
   }
+  postMessage({ id, type: "started" });
   try {
     const res = py.globals.get("_run")(code, stdin || "", check || "");
     postMessage({ id, type: "result", ...JSON.parse(res) });
