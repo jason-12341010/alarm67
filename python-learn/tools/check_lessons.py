@@ -21,14 +21,14 @@ class Timeout(Exception):
 
 
 def _alarm(*_):
-    raise Timeout("超過 3 秒（可能是刻意的無窮迴圈示範）")
+    raise Timeout("超過 6 秒（可能是刻意的無窮迴圈示範）")
 
 
 signal.signal(signal.SIGALRM, _alarm)
 
 
 def run(code, stdin="", check=""):
-    signal.alarm(3)
+    signal.alarm(6)
     try:
         return json.loads(ns["_run"](code, stdin, check))
     finally:

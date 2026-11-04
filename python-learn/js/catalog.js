@@ -48,7 +48,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s4", num: 4, part: "A", icon: "🔴", title: "進階技巧", ready: false,
+    id: "s4", num: 4, part: "A", icon: "🔴", title: "進階技巧", ready: true,
     desc: "產生器、裝飾器、async、型別提示、metaclass。",
     lessons: [
       "迭代器與產生器", "閉包", "裝飾器", "上下文管理器 with", "型別提示 typing",
