@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<title>練習場｜Python 學習路線</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+<main class="playground">
+  <h1>🧪 自由練習場</h1>
+  <p class="muted">想試什麼就寫什麼。按 <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 執行。你寫的程式會自動存在這個瀏覽器裡。</p>
+  <div id="pg-editor"></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/common.js"></script>
+<script src="js/runner.js"></script>
+<script>
+  renderHeader("playground");
+  const KEY = "pylearn-playground";
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (_) {}
+  const starter = '# 在這裡自由練習 Python\nimport random\n\nname = "Python"\nprint(f"哈囉，{name}！")\nprint("今天的幸運數字：", random.randint(1, 100))\n';
+  const block = createCodeBlock(document.getElementById("pg-editor"), { code: saved || starter, tall: true });
+  block.cm.on("change", () => { try { localStorage.setItem(KEY, block.cm.getValue()); } catch (_) {} });
+  // 重設時回到範例程式
+  document.querySelector(".cb-reset").addEventListener("click", () => block.cm.setValue(starter));
+  PyRunner.start();
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<title>Python 學習路線</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+<main class="home">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">從基礎語法到 AI 應用</p>
+      <h1>在瀏覽器裡<br>直接學 <span class="py">Python</span></h1>
+      <p class="lead">不用安裝任何東西。每一課都有說明、可以直接執行的範例，以及會自動檢查答案的練習題。學完基礎之後，可以往 Web 開發或 AI 與數據分析發展。</p>
+      <div class="hero-cta">
+        <a class="btn primary big" id="continue-btn" href="lesson.html?id=s1-01">開始學習 →</a>
+        <a class="btn ghost big" href="playground.html">打開練習場</a>
+      </div>
+    </div>
+    <div class="hero-code" aria-hidden="true"><pre><span class="k">for</span> step <span class="k">in</span> [<span class="s">"語法"</span>, <span class="s">"物件導向"</span>,
+             <span class="s">"資料分析"</span>, <span class="s">"機器學習"</span>, <span class="s">"AI"</span>]:
+    <span class="f">print</span>(<span class="s">f"學會了 {step} ✓"</span>)</pre></div>
+  </section>
+
+  <section class="overall" id="overall"></section>
+
+  <section>
+    <h2 class="section-title">🗺️ 技能地圖</h2>
+    <p class="muted">先學完 Python 本身（第 1～5 階段），再依照興趣選一條路線，兩條都走也可以。</p>
+    <div class="skill-map" id="skill-map"></div>
+  </section>
+
+  <section>
+    <h2 class="section-title">📚 所有階段</h2>
+    <div class="stage-grid" id="stage-grid"></div>
+  </section>
+
+  <footer class="site-footer">學習進度存在你的瀏覽器裡。Python 執行環境：Pyodide。</footer>
+</main>
+<script src="js/catalog.js"></script>
+<script src="js/common.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>
