@@ -67,12 +67,12 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s6", num: 6, part: "B", icon: "🌐", title: "Web 框架與自動化", ready: false,
+    id: "s6", num: 6, part: "B", icon: "🌐", title: "Web 框架與自動化", ready: true,
     desc: "Flask、FastAPI、Django，加上爬蟲和 Excel 自動化（在自己電腦上實作）。",
     lessons: [
       "HTTP 與 Web 基礎", "Flask：路由與模板", "Flask：表單與資料庫", "FastAPI：建立 API",
       "FastAPI：Pydantic 資料驗證", "Django：專案與 MVT 架構", "Django：ORM 與後台",
-      "SQLAlchemy 與 SQLite", "Streamlit 快速做介面", "requests 與 BeautifulSoup 爬蟲",
+      "SQLAlchemy 與 SQLite", "部署：把網站放上網路", "requests 與 BeautifulSoup 爬蟲",
       "Excel 自動化 openpyxl", "🎯 專案：待辦事項 API",
     ],
   },
