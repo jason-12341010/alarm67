@@ -95,7 +95,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s9", num: 9, part: "C", icon: "🧠", title: "深度學習", ready: false,
+    id: "s9", num: 9, part: "C", icon: "🧠", title: "深度學習", ready: true,
     desc: "從 NumPy 手寫神經網路，到 PyTorch 影像辨識。",
     lessons: [
       "神經網路原理", "用 NumPy 手寫神經網路", "PyTorch 張量", "自動微分", "訓練迴圈",
@@ -104,7 +104,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s10", num: 10, part: "C", icon: "✨", title: "AI 應用與大型語言模型", ready: false,
+    id: "s10", num: 10, part: "C", icon: "✨", title: "AI 應用與大型語言模型", ready: true,
     desc: "Hugging Face、LLM API、Embeddings、RAG、AI Agent。",
     lessons: [
       "Hugging Face 現成模型", "呼叫 LLM API", "提示詞設計", "Embeddings 與語意搜尋",

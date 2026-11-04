@@ -30,7 +30,7 @@ const PyRunner = {
   waiting: null,   // { id, resolve, timer }
   queue: Promise.resolve(),
   readyPromise: null,
-  TIMEOUT: 15000,
+  TIMEOUT: 30000,
   LOAD_TIMEOUT: 180000,
 
   start() {
@@ -104,7 +104,7 @@ const PyRunner = {
             output: "", error_type: "Timeout",
             error: loading
               ? "下載套件花了太久時間，請檢查網路連線後再試一次。"
-              : `執行超過 ${this.TIMEOUT / 1000} 秒被強制停止。很可能是無窮迴圈：檢查 while 的條件最後會不會變成 False。`,
+              : `執行超過 ${this.TIMEOUT / 1000} 秒被強制停止。可能是無窮迴圈（檢查 while 的條件最後會不會變成 False），或是計算量太大（試著減少資料量或迴圈次數）。`,
           });
         };
         const timer = setTimeout(() => onTimeout(true), this.LOAD_TIMEOUT);
