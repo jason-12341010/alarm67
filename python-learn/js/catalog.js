@@ -77,7 +77,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s7", num: 7, part: "C", icon: "📊", title: "資料分析", ready: false,
+    id: "s7", num: 7, part: "C", icon: "📊", title: "資料分析", ready: true,
     desc: "NumPy、Pandas、Matplotlib、統計基礎。AI 的地基。",
     lessons: [
       "NumPy 陣列", "向量化運算與廣播", "Pandas：Series 與 DataFrame", "讀取與篩選資料",
@@ -86,12 +86,12 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s8", num: 8, part: "C", icon: "🤖", title: "機器學習", ready: false,
+    id: "s8", num: 8, part: "C", icon: "🤖", title: "機器學習", ready: true,
     desc: "scikit-learn：迴歸、分類、分群、模型評估。",
     lessons: [
-      "機器學習是什麼", "線性迴歸", "邏輯迴歸與分類", "決策樹與隨機森林", "KNN",
-      "K-Means 分群", "訓練集、測試集與過擬合", "評估指標與混淆矩陣", "特徵工程",
-      "交叉驗證與調參", "🎯 專案：鐵達尼號生還預測", "🎯 專案：房價預測",
+      "機器學習是什麼", "線性迴歸", "邏輯迴歸與分類", "評估指標與混淆矩陣",
+      "訓練集、測試集與過擬合", "決策樹與隨機森林", "KNN 與特徵縮放", "K-Means 分群",
+      "特徵工程與 Pipeline", "交叉驗證與調參", "🎯 專案：鐵達尼號生還預測", "🎯 專案：房價預測",
     ],
   },
   {
