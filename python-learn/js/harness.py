@@ -4,6 +4,8 @@ import sys, io, os, json, base64, traceback, builtins, warnings
 os.environ.setdefault("MPLBACKEND", "AGG")
 warnings.filterwarnings("ignore", message=".*non-interactive.*")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message="Glyph .* missing")
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 _FILENAME = "<你的程式>"
 
@@ -74,6 +76,15 @@ def _prepare_matplotlib(code):
         import matplotlib.pyplot as plt
         plt.show = _show
         plt.close("all")
+        if os.path.exists("/fonts/NotoSansTC.ttf") and not getattr(plt, "_pylearn_font", False):
+            from matplotlib import font_manager
+            font_manager.fontManager.addfont("/fonts/NotoSansTC.ttf")
+            plt._pylearn_font = True
+        if getattr(plt, "_pylearn_font", False):
+            # 每次都設定一次（使用者可能改過 rcParams）：中文用 Noto Sans TC，負號正常顯示
+            plt.rcParams["font.sans-serif"] = ["Noto Sans TC", "DejaVu Sans"]
+            plt.rcParams["font.family"] = "sans-serif"
+            plt.rcParams["axes.unicode_minus"] = False
     except ImportError:
         pass
 
@@ -170,6 +181,14 @@ def _run(code, stdin_text, check_code):
     try:
         _prepare_matplotlib(code)
         _prepare_asyncio(code)
+        if "logging" in sys.modules:
+            # 每次執行都重新開始，避免上一次的 handler 還指向舊的輸出
+            import logging
+            logging.root.handlers.clear()
+            for lg in list(logging.Logger.manager.loggerDict.values()):
+                if isinstance(lg, logging.Logger):
+                    lg.handlers.clear()
+                    lg.setLevel(logging.NOTSET)
         exec(compile(code, _FILENAME, "exec"), ns)
         _grab_figures()
     except SystemExit:

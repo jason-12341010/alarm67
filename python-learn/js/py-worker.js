@@ -31,6 +31,19 @@ async function mountDataFiles(py, code) {
   }
 }
 
+// 瀏覽器版 matplotlib 沒有中文字型：第一次畫圖時載入精簡版的 Noto Sans TC
+let fontMounted = false;
+async function mountFont(py) {
+  if (fontMounted) return;
+  try {
+    const r = await fetch("../data/fonts/NotoSansTC-subset.ttf");
+    if (!r.ok) return;
+    py.FS.mkdirTree("/fonts");
+    py.FS.writeFile("/fonts/NotoSansTC.ttf", new Uint8Array(await r.arrayBuffer()));
+    fontMounted = true;
+  } catch (_) { /* 沒有字型就用預設字型 */ }
+}
+
 self.onmessage = async (e) => {
   const { id, type, code, stdin, check } = e.data;
   let py;
@@ -62,6 +75,7 @@ self.onmessage = async (e) => {
       }
     }
     await mountDataFiles(py, all);
+    if (/matplotlib|pandas|seaborn/.test(all)) await mountFont(py);
   } catch (err) {
     /* 找不到的套件交給 Python 自己報 ModuleNotFoundError */
     console.warn("套件載入失敗", err);

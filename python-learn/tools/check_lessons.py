@@ -51,6 +51,9 @@ def parse_ex(body):
 def main(only=None):
     import os, tempfile
     os.chdir(tempfile.mkdtemp(prefix="lesson-check-"))  # 練習會建立檔案，不要弄髒專案資料夾
+    import shutil
+    for csv in (ROOT / "data").glob("*.csv"):  # 跟瀏覽器一樣，資料檔放在目前資料夾
+        shutil.copy(csv, ".")
     problems = 0
     files = sorted((ROOT / "lessons").glob("s*/*.md"))
     for f in files:

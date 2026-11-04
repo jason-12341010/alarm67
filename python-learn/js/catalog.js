@@ -58,7 +58,7 @@ window.CATALOG = [
     ],
   },
   {
-    id: "s5", num: 5, part: "A", icon: "🧰", title: "工程實務與演算法", ready: false,
+    id: "s5", num: 5, part: "A", icon: "🧰", title: "工程實務與演算法", ready: true,
     desc: "在自己電腦建立開發環境、測試、套件管理，以及常見演算法。",
     lessons: [
       "在自己電腦安裝 Python 與 VS Code", "虛擬環境 venv 與 pip / uv", "logging 日誌", "pytest 測試",
