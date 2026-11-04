@@ -278,3 +278,113 @@ kbd { background: var(--surface-2); border: 1px solid var(--border); border-radi
   .exercise { padding: 14px 12px 4px; margin-left: -4px; margin-right: -4px; }
   .cb-label { width: 100%; }
 }
+
+/* ---------- 搜尋 ---------- */
+.search { position: relative; flex: 0 1 260px; margin-left: auto; }
+.search input {
+  width: 100%; font: inherit; font-size: 14px; padding: 7px 34px 7px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+}
+.search input:focus { outline: 2px solid color-mix(in srgb, var(--blue) 45%, transparent); background: var(--surface); }
+.search-key { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; opacity: .7; }
+.search input:focus ~ .search-key { display: none; }
+.search-results {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; min-width: 320px; max-height: 70vh; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .18); z-index: 40; padding: 6px;
+}
+.search-results a { display: grid; gap: 2px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--text); }
+.search-results a.active, .search-results a:hover { background: var(--blue-soft); }
+.sr-stage { font-size: 12px; color: var(--muted); }
+.sr-title { font-weight: 700; font-size: 15px; }
+.sr-snippet { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.sr-snippet mark { background: var(--yellow-soft); color: var(--text); border-radius: 3px; padding: 0 2px; }
+.sr-empty { padding: 12px; color: var(--muted); font-size: 14px; }
+.py-status { margin-left: 0; }
+
+/* ---------- 課程頁：標籤、完成區 ---------- */
+.lesson-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 20px; }
+.tag { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--surface-2); color: var(--muted); font-weight: 500; }
+.tag.ok { background: var(--green-soft); color: var(--green); }
+.tag.local { background: var(--yellow-soft); color: color-mix(in srgb, var(--text) 80%, var(--yellow)); }
+.tag.ex { background: var(--blue-soft); color: var(--blue); }
+.tag.boss { background: var(--red-soft); color: var(--red); }
+.done-wrap { display: flex; flex-direction: column; gap: 4px; }
+.stage-link { color: inherit; text-decoration: none; }
+.stage-link:hover { color: var(--blue); }
+
+/* ---------- 徽章 ---------- */
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
+.badge { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 16px 10px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
+.badge-icon { font-size: 34px; line-height: 1.2; }
+.badge-name { font-weight: 700; font-size: 14px; }
+.badge-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.badge.earned { border-color: var(--yellow); background: color-mix(in srgb, var(--yellow-soft) 60%, var(--surface)); box-shadow: var(--shadow); }
+.badge.locked { opacity: .55; }
+
+/* ---------- 頁尾 ---------- */
+.site-footer p { margin: 6px 0; }
+.footer-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 10px 0; }
+.footer-actions label.btn { cursor: pointer; }
+
+/* ---------- 通知 ---------- */
+#toasts { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 50; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
+#toasts .toast { position: static; transform: translateY(20px); left: auto; bottom: auto; }
+#toasts .toast.show { transform: translateY(0); }
+
+/* ---------- 速查表 ---------- */
+.cheatsheet { max-width: 1280px; margin: 0 auto; padding: 28px 16px 60px; }
+.cheat-head h1 { margin: 0 0 4px; }
+.cheat-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 8px; }
+.cheat-toc a { font-size: 14px; padding: 4px 12px; border-radius: 99px; background: var(--surface-2); color: var(--text); text-decoration: none; }
+.cheat-toc a:hover { background: var(--blue-soft); color: var(--blue); }
+.cheatsheet h2 { font-size: 22px; margin: 36px 0 12px; scroll-margin-top: 80px; }
+.cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.cheat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); min-width: 0; }
+.cheat-card h3 { margin: 0 0 8px; font-size: 15px; }
+.cheat-card pre { position: relative; margin: 0; padding: 10px 12px; background: var(--code-bg); color: var(--code-text); border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.6; border: 1px solid var(--border); }
+.copy-mini { position: absolute; top: 4px; right: 4px; border: 0; background: var(--surface-2); border-radius: 6px; cursor: pointer; font-size: 12px; padding: 2px 6px; opacity: .6; }
+.copy-mini:hover { opacity: 1; }
+.cm-s-default .cm-attribute, .cm-s-default .cm-atom { color: var(--tok-number); }
+
+/* ---------- 鍵盤操作的可見焦點 ---------- */
+a:focus-visible, button:focus-visible, summary:focus-visible, .btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ---------- 響應式：頁首兩列、手機的課程列表 ---------- */
+@media (max-width: 1000px) {
+  .header-inner { flex-wrap: wrap; row-gap: 8px; }
+  .search { order: 10; flex: 1 1 100%; margin-left: 0; }
+  .search-key { display: none; }
+  .py-status { margin-left: auto; }
+  .search-results { min-width: 0; }
+}
+@media (max-width: 900px) {
+  .lesson-side { inset: 0; z-index: 30; padding: 20px 16px 90px; }
+  .side-toggle { z-index: 31; }
+  body.side-open { overflow: hidden; }
+}
+@media (max-width: 560px) {
+  .brand-text { display: none; }
+  .header-inner nav a { padding: 6px 8px; font-size: 14px; }
+  .py-status { font-size: 0; }
+  .py-status::before { content: "●"; font-size: 14px; }
+  .py-status.idle::before, .py-status:empty::before { content: ""; }
+  .lesson-footer { flex-direction: column; align-items: stretch; }
+  .pager { justify-content: space-between; }
+  .cheat-grid { grid-template-columns: 1fr; }
+}
+.hero > * { min-width: 0; }
+@media (max-width: 560px) {
+  .hero-code pre { font-size: 13px; padding: 16px; }
+  .hero h1 { font-size: 34px; }
+}
+
+/* 程式碼不要用連字（>= 變成 ≥ 會讓初學者看不懂） */
+code, kbd, pre, .CodeMirror, .cb-stdin textarea { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+/* 深色模式下主要按鈕用深色字，對比比較清楚 */
+:root { --on-blue: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-blue: #0b1220; } }
+:root[data-theme="dark"] { --on-blue: #0b1220; }
+.btn.primary, .ex-tag { color: var(--on-blue); }
+@media (max-width: 900px) {
+  .lesson-side { max-height: none; height: 100vh; height: 100dvh; }
+}

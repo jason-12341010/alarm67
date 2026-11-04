@@ -64,7 +64,9 @@ self.onmessage = async (e) => {
     missing.forEach((m) => loadedOnce.add(m));
     if (missing.length) status(id, `📦 第一次使用，正在下載套件：${missing.join("、")}（可能要十幾秒）…`);
     await py.loadPackagesFromImports(all);
-    const pip = wanted.filter((m) => MICROPIP[m] && !installed.has(m));
+    // pandas 的 to_excel / read_excel 在背後需要 openpyxl，程式裡不一定有 import
+    if (/\.to_excel\(|read_excel\(|ExcelWriter|ExcelFile/.test(all)) wanted.push("openpyxl");
+    const pip = [...new Set(wanted)].filter((m) => MICROPIP[m] && !installed.has(m));
     if (pip.length) {
       status(id, `📦 正在從 PyPI 安裝：${pip.join("、")}…`);
       await py.loadPackage("micropip");

@@ -6,20 +6,31 @@
 - Python 透過 [Pyodide](https://pyodide.org/) 在瀏覽器裡執行，不用安裝任何東西
 - 學習進度存在瀏覽器的 localStorage，不需要帳號
 
-## 目前進度
+## 課程內容（10 個階段、114 課）
 
-| 階段 | 狀態 |
-|---|---|
-| 1. 入門基礎（14 課） | ✅ 完成 |
-| 2. 中級語法（12 課） | ✅ 完成 |
-| 3. 物件導向 | 🚧 製作中 |
-| 4. 進階技巧 | 🚧 |
-| 5. 工程實務與演算法 | 🚧 |
-| 6. Web 框架與自動化 | 🚧 |
-| 7. 資料分析 | 🚧 |
-| 8. 機器學習 | 🚧 |
-| 9. 深度學習 | 🚧 |
-| 10. AI 應用與大型語言模型 | 🚧 |
+| 階段 | 課數 | 內容 |
+|---|---|---|
+| 1. 入門基礎 | 14 | print、變數、運算子、字串、條件、迴圈、list / tuple / set / dict、🎯 猜數字遊戲 |
+| 2. 中級語法 | 12 | 函式、作用域、lambda、推導式、例外、檔案 / CSV / JSON、模組、match、🎯 記帳本 |
+| 3. 物件導向 | 10 | class、繼承、多型、property、魔術方法、抽象類別、dataclass、🎯 文字 RPG |
+| 4. 進階技巧 | 13 | 產生器、閉包、裝飾器、with、型別提示、collections、itertools、regex、async、多執行緒、描述器、效能、🎯 非同步爬蟲 |
+| 5. 工程實務與演算法 | 12 | 安裝環境、venv / uv、logging、pytest、打包、Big-O、排序、搜尋、遞迴、堆疊佇列、樹與圖、動態規劃 |
+| 6. Web 框架與自動化 | 12 | HTTP、Flask、FastAPI、Pydantic、Django、SQLAlchemy、部署、爬蟲、Excel 自動化、🎯 待辦事項 API |
+| 7. 資料分析 | 12 | NumPy、pandas、資料清理、Matplotlib、Seaborn、統計、機率、相關性、🎯 商業分析報告 |
+| 8. 機器學習 | 12 | 迴歸、分類、評估指標、過擬合、決策樹與森林、KNN、K-Means、Pipeline、調參、🎯 鐵達尼號、🎯 房價預測 |
+| 9. 深度學習 | 9 | 神經網路、NumPy 手寫反向傳播、PyTorch、自動微分、CNN、Transformer、🎯 手寫數字辨識 |
+| 10. AI 應用 | 8 | Hugging Face、LLM API、提示詞、Embeddings、RAG、AI Agent、Gradio / Streamlit、🎯 PDF 問答機器人 |
+
+需要開伺服器或 GPU 的內容（Flask、Django、PyTorch、呼叫 LLM API…）會標示「💻 部分程式要在自己的電腦或 Colab 執行」，並附上一步一步的操作說明；概念練習一樣可以在網頁上完成。
+
+## 網站功能
+
+- 🐍 **瀏覽器內執行 Python**：Pyodide（Python 3.12），支援 NumPy、pandas、Matplotlib、scikit-learn、SciPy、SQLAlchemy、Pydantic、BeautifulSoup 等；seaborn、openpyxl 會自動從 PyPI 安裝
+- 📊 圖表直接顯示（已內建中文字型）、`display(df)` 顯示成表格、`input()` 用輸入框、`asyncio.run()` 可用
+- ✏️ 練習題自動檢查、提示、參考解答；全部通過自動完成本課
+- 🩺 錯誤訊息中文說明，並標出出錯的那一行；無窮迴圈 30 秒自動停止（也可以按停止）
+- 🗺️ 技能地圖、📈 學習進度、🏆 徽章、🔍 全文搜尋（按 `/`）、📝 速查表、🧪 練習場
+- 🌙 深色模式、📱 手機版面、⬇️ 進度備份與還原
 
 ## 怎麼打開網站
 
@@ -43,9 +54,10 @@ python -m http.server 8000
 
 ```
 python-learn/
-├── index.html          首頁：整體進度、技能地圖、所有階段
+├── index.html          首頁：整體進度、技能地圖、所有階段、徽章
 ├── lesson.html         課程頁
 ├── playground.html     自由練習場
+├── cheatsheet.html     速查表（內容在 lessons/cheatsheet.md）
 ├── css/style.css       樣式（淺色 / 深色主題）
 ├── js/
 │   ├── catalog.js      課程目錄（所有階段和課程標題）
@@ -56,10 +68,16 @@ python-learn/
 │   ├── lesson.js       讀取並顯示課程
 │   └── home.js         首頁
 ├── lessons/
-│   ├── s1/01.md …      第 1 階段的課程
-│   └── s2/01.md …      第 2 階段的課程
+│   ├── s1/01.md …      第 1～10 階段的課程
+│   └── cheatsheet.md   速查表
+├── data/
+│   ├── *.csv           練習用資料集（titanic.csv 是公開的真實資料，其他是模擬資料）
+│   ├── search-index.json  搜尋索引
+│   └── fonts/          圖表用的中文字型（Noto Sans TC 精簡版，SIL OFL 授權）
 └── tools/
-    └── check_lessons.py   檢查所有課程的解答和範例
+    ├── check_lessons.py   檢查所有課程的解答和範例
+    ├── build_search.py    重新產生搜尋索引
+    └── make_data.py       重新產生模擬資料集
 ```
 
 ## 新增課程
@@ -103,9 +121,12 @@ assert ns["answer"] == 42, "答錯時顯示的訊息"
 :::
 ````
 
-3. 執行檢查（每個解答都要通過、起始程式不能直接通過）：
+3. 執行檢查（每個解答都要通過、起始程式不能直接通過），並更新搜尋索引：
 
 ```bash
 python3 tools/check_lessons.py        # 全部
 python3 tools/check_lessons.py s2     # 只檢查第 2 階段
+python3 tools/build_search.py         # 更新搜尋索引
 ```
+
+> 本機的 Python 套件版本可能和瀏覽器裡的 Pyodide 不同，最終以瀏覽器實際執行的結果為準。

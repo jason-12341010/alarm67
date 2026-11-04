@@ -51,12 +51,16 @@ async function initLesson() {
   main.innerHTML = `
     <div class="lesson-crumb"><a href="index.html">課程地圖</a> › ${stage.icon} 第 ${stage.num} 階段：${stage.title} › 第 ${index + 1} 課</div>
     <h1 class="lesson-title">${escapeHtml(info.title)}</h1>
+    <div class="lesson-tags" id="lesson-tags"></div>
     <article class="prose" id="prose"><p class="muted">載入課程中…</p></article>
     <div class="lesson-footer">
-      <button class="btn ${Store.isDone(id) ? "done" : "primary"}" id="done-btn"></button>
+      <div class="done-wrap">
+        <button class="btn ${Store.isDone(id) ? "done" : "primary"}" id="done-btn"></button>
+        <span class="muted small" id="ex-progress"></span>
+      </div>
       <div class="pager">
         ${prevId ? `<a class="btn ghost" href="lesson.html?id=${prevId}">← 上一課</a>` : ""}
-        ${nextId ? `<a class="btn ghost" href="lesson.html?id=${nextId}">下一課 →</a>` : `<a class="btn ghost" href="index.html">回到課程地圖</a>`}
+        ${nextId ? `<a class="btn ghost" id="next-btn" href="lesson.html?id=${nextId}">下一課 →</a>` : `<a class="btn ghost" id="next-btn" href="index.html">回到課程地圖 🎉</a>`}
       </div>
     </div>`;
 
@@ -65,9 +69,14 @@ async function initLesson() {
     const d = Store.isDone(id);
     doneBtn.textContent = d ? "✅ 已完成（點一下取消）" : "標記本課為完成";
     doneBtn.className = "btn " + (d ? "done" : "primary");
+    document.getElementById("next-btn")?.classList.toggle("primary", d);   // 完成後，下一課變成主要按鈕
     renderSidebar(stage, id);
   };
-  doneBtn.addEventListener("click", () => { Store.setDone(id, !Store.isDone(id)); paintDone(); });
+  doneBtn.addEventListener("click", () => {
+    Store.setDone(id, !Store.isDone(id));
+    paintDone();
+    if (Store.isDone(id)) Badges.announce();
+  });
   paintDone();
 
   if (!stage.ready) {
@@ -124,6 +133,13 @@ async function initLesson() {
 
   // 練習題
   const allPassed = () => exercises.every((_, i) => Store.exPassed(`${id}#${i}`));
+  const paintExProgress = () => {
+    const el = document.getElementById("ex-progress");
+    if (!exercises.length) return;
+    const n = exercises.filter((_, i) => Store.exPassed(`${id}#${i}`)).length;
+    el.textContent = n === exercises.length ? `練習 ${n}/${n} 全部通過 🎉` : `練習 ${n}/${exercises.length} 通過，全部通過會自動完成本課`;
+  };
+  paintExProgress();
   prose.querySelectorAll(".ex-slot").forEach((slot) => {
     const i = +slot.dataset.i;
     const ex = exercises[i];
@@ -143,17 +159,29 @@ async function initLesson() {
         key: `${id}#${i}`, check: ex.check, stdin: ex.stdin, hint: ex.hint, solution: ex.solution,
         onPass: () => {
           paint();
+          paintExProgress();
           if (allPassed() && !Store.isDone(id)) {
             Store.setDone(id);
             paintDone();
             toast("🎉 本課的練習全部通過，已自動標記為完成！");
           }
+          Badges.announce();
         },
       },
     });
   });
 
-  PyRunner.start();
+  // 標題下的標籤：讓學生一眼知道這課能不能在網頁上完成
+  const runnable = prose.querySelectorAll(".code-block .cb-run").length;
+  const local = prose.querySelectorAll(".code-block:not(:has(.cb-run)), pre.terminal").length;
+  const tags = [];
+  if (runnable) tags.push(`<span class="tag ok">🐍 可以在網頁上執行</span>`);
+  if (local) tags.push(`<span class="tag local">💻 部分程式要在自己的電腦或 Colab 執行</span>`);
+  if (exercises.length) tags.push(`<span class="tag ex">✏️ ${exercises.length} 題練習</span>`);
+  if (info.title.startsWith("🎯")) tags.push(`<span class="tag boss">⚔️ 專案關卡</span>`);
+  document.getElementById("lesson-tags").innerHTML = tags.join("");
+
+  if (runnable) PyRunner.start();     // 有可執行的程式才預先載入 Python
 }
 
 function renderSidebar(stage, currentId) {
@@ -175,14 +203,8 @@ function renderSidebar(stage, currentId) {
     </ol>`;
 }
 
-function toast(msg) {
-  const t = document.createElement("div");
-  t.className = "toast";
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.classList.add("show"), 10);
-  setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 400); }, 3500);
-}
-
-document.getElementById("side-toggle")?.addEventListener("click", () => document.body.classList.toggle("side-open"));
+document.getElementById("side-toggle")?.addEventListener("click", (e) => {
+  const open = document.body.classList.toggle("side-open");
+  e.currentTarget.textContent = open ? "✕ 關閉列表" : "☰ 課程列表";
+});
 initLesson();

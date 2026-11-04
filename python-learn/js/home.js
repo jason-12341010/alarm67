@@ -22,10 +22,18 @@ document.getElementById("overall").innerHTML = `
     ${nextInfo ? `<a class="next-up" href="lesson.html?id=${next}"><span class="muted small">下一課</span><b>${nextInfo.stage.icon} ${escapeHtml(nextInfo.title)}</b></a>` : ""}
   </div>`;
 
+// 這個階段第一個還沒完成的課（全部完成就回到第一課）
+function stageEntry(stage) {
+  for (let i = 0; i < stage.lessons.length; i++) {
+    if (!Store.isDone(lessonId(stage, i))) return lessonId(stage, i);
+  }
+  return lessonId(stage, 0);
+}
+
 function node(stage) {
   const p = Store.stageProgress(stage);
   const state = !stage.ready ? "soon" : p.done === p.total ? "complete" : p.done > 0 ? "doing" : "open";
-  const first = lessonId(stage, 0);
+  const first = stageEntry(stage);
   return `<a class="map-node ${state}" href="lesson.html?id=${first}" style="--pct:${p.pct}%">
       <span class="map-icon">${stage.icon}</span>
       <span class="map-num">${stage.num}</span>
@@ -59,7 +67,7 @@ document.getElementById("stage-grid").innerHTML = CATALOG.map((stage) => {
       <span class="stage-num">第 ${stage.num} 階段</span>
       ${stage.ready ? "" : `<span class="pill">製作中</span>`}
     </div>
-    <h3>${stage.title}</h3>
+    <h3><a class="stage-link" href="lesson.html?id=${stageEntry(stage)}">${stage.title}</a></h3>
     <p class="muted">${stage.desc}</p>
     <div class="bar"><span style="width:${p.pct}%"></span></div>
     <details>
@@ -71,3 +79,16 @@ document.getElementById("stage-grid").innerHTML = CATALOG.map((stage) => {
     </details>
   </article>`;
 }).join("");
+
+Badges.check();
+const earned = Store.load().badges;
+document.getElementById("badge-grid").innerHTML = Badges.list().map((b) => `
+  <div class="badge ${earned[b.id] ? "earned" : "locked"}" title="${escapeHtml(b.desc)}">
+    <span class="badge-icon">${earned[b.id] ? b.icon : "🔒"}</span>
+    <span class="badge-name">${escapeHtml(b.name)}</span>
+    <span class="badge-desc">${escapeHtml(b.desc)}</span>
+  </div>`).join("");
+
+document.getElementById("export-btn").addEventListener("click", () => Backup.export());
+document.getElementById("import-file").addEventListener("change", (e) => e.target.files[0] && Backup.import(e.target.files[0]));
+document.getElementById("reset-btn").addEventListener("click", () => Backup.reset());

@@ -41,7 +41,21 @@
     <div class="stage-grid" id="stage-grid"></div>
   </section>
 
-  <footer class="site-footer">學習進度存在你的瀏覽器裡。Python 執行環境：Pyodide。</footer>
+  <section>
+    <h2 class="section-title">🏆 我的徽章</h2>
+    <p class="muted">完成課程、通過練習、打倒每個階段的 🎯 專案關卡，就能收集徽章。</p>
+    <div class="badge-grid" id="badge-grid"></div>
+  </section>
+
+  <footer class="site-footer">
+    <p>學習進度存在<b>這個瀏覽器</b>裡。換電腦或清除瀏覽器資料前，記得先備份。</p>
+    <div class="footer-actions">
+      <button class="btn ghost small" id="export-btn">⬇️ 備份進度</button>
+      <label class="btn ghost small">⬆️ 還原進度<input type="file" id="import-file" accept="application/json" hidden></label>
+      <button class="btn ghost small" id="reset-btn">🗑️ 清除進度</button>
+    </div>
+    <p class="small">Python 執行環境：<a href="https://pyodide.org" target="_blank" rel="noopener">Pyodide</a>　圖表中文字型：Noto Sans TC（SIL OFL）</p>
+  </footer>
 </main>
 <script src="js/catalog.js"></script>
 <script src="js/common.js"></script>

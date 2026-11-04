@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<title>速查表｜Python 學習路線</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+<main class="cheatsheet">
+  <div class="cheat-head">
+    <h1>📝 Python 速查表</h1>
+    <p class="muted">每個主題最常用的語法，忘記的時候回來看一眼。點一下區塊右上角可以複製。</p>
+    <nav class="cheat-toc" id="cheat-toc"></nav>
+  </div>
+  <div id="cheat-body"><p class="muted">載入中…</p></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/runmode/runmode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/common.js"></script>
+<script>
+  renderHeader("cheatsheet");
+  (async () => {
+    const body = document.getElementById("cheat-body");
+    let md;
+    try {
+      md = await (await fetch("lessons/cheatsheet.md")).text();
+    } catch (_) {
+      body.innerHTML = '<div class="callout">⚠️ 速查表載入失敗，請用本機伺服器開啟（說明在 README）。</div>';
+      return;
+    }
+    const tmp = document.createElement("div");
+    tmp.innerHTML = marked.parse(md);
+    // 把「h2 + 底下的 h3 區塊」整理成一張張卡片
+    const out = document.createElement("div");
+    let grid = null, card = null;
+    const toc = [];
+    for (const el of [...tmp.children]) {
+      if (el.tagName === "H2") {
+        const id = "sec-" + toc.length;
+        el.id = id;
+        toc.push(`<a href="#${id}">${el.textContent}</a>`);
+        out.appendChild(el);
+        grid = document.createElement("div");
+        grid.className = "cheat-grid";
+        out.appendChild(grid);
+      } else if (el.tagName === "H3") {
+        card = document.createElement("section");
+        card.className = "cheat-card";
+        card.appendChild(el);
+        grid.appendChild(card);
+      } else if (card) {
+        card.appendChild(el);
+      }
+    }
+    body.replaceChildren(out);
+    document.getElementById("cheat-toc").innerHTML = toc.join("");
+    body.querySelectorAll("pre > code").forEach((code) => {
+      const pre = code.parentElement;
+      const text = code.textContent.replace(/\n$/, "");
+      const mode = code.className.includes("bash") ? "shell" : "python";
+      pre.classList.add("cm-s-default");
+      code.textContent = "";
+      CodeMirror.runMode(text, mode, code);       // 語法上色
+      const btn = document.createElement("button");
+      btn.className = "copy-mini";
+      btn.title = "複製";
+      btn.textContent = "📋";
+      btn.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(text); btn.textContent = "✓"; }
+        catch (_) { btn.textContent = "✗"; }
+        setTimeout(() => (btn.textContent = "📋"), 1200);
+      });
+      pre.appendChild(btn);
+    });
+  })();
+</script>
+</body>
+</html>
