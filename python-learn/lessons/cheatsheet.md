@@ -21,7 +21,7 @@ int("42"), float("3.5"), str(42), bool(0)
 2 ** 10  # 1024  次方
 x += 1             # 複合賦值
 a == b, a != b     # 比較
-and, or, not       # 邏輯
+a and b, a or b, not a  # 邏輯
 ```
 
 ### 字串
@@ -50,12 +50,14 @@ kind = "偶" if n % 2 == 0 else "奇"
 ### 迴圈
 
 ```py
-for i in range(5):         # 0~4
-for i in range(1, 10, 2):  # 1,3,5,7,9
-for i, v in enumerate(items):
-for a, b in zip(xs, ys):
+for i in range(5): ...          # 0~4
+for i in range(1, 10, 2): ...   # 1,3,5,7,9
+for i, v in enumerate(items): ...
+for a, b in zip(xs, ys): ...
 while cond:
-    break / continue
+    if done:
+        break                   # 跳出迴圈
+    continue                    # 直接下一輪
 ```
 
 ### 輸入輸出
@@ -97,7 +99,7 @@ d = {"a": 1, "b": 2}
 d["c"] = 3
 d.get("z", 0)
 "a" in d
-for k, v in d.items():
+for k, v in d.items(): print(k, v)
 d.keys(), d.values()
 {k: v * 2 for k, v in d.items()}
 ```
@@ -400,11 +402,11 @@ import anthropic
 client = anthropic.Anthropic()   # 讀取 ANTHROPIC_API_KEY
 r = client.messages.create(
     model="claude-opus-5-5",
-    max_tokens=1024,
+    max_tokens=4096,
     system="你是…",
     messages=[{"role": "user", "content": "你好"}],
 )
-print(r.content[0].text)
+print("".join(b.text for b in r.content if b.type == "text"))
 ```
 
 ### Hugging Face
